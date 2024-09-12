@@ -181,19 +181,21 @@ func get_Packed_color_array() -> PackedColorArray:
 
 
 func get_object(object_name: String) -> Object:
-	assert(ClassDB.class_exists(object_name))  #,"Class " + object_name + " doesn't exists.")
+	assert(ClassDB.class_exists(object_name)) # ,"Class " + object_name + " doesn't exists.")
 #	if object_name == "PhysicsDirectSpaceState3D" || object_name == "PhysicsDirectSpaceState2D":
 #		return BoxShape3D.new()
 
 	var a = 0
-	if ClassDB.can_instantiate(object_name):  # E.g. Texture2D is not instantable or shouldn't be, but ImageTexture is
+	if ClassDB.can_instantiate(object_name): # E.g. Texture2D is not instantable or shouldn't be, but ImageTexture is
 		return ClassDB.instantiate(object_name)
 	else:
 		# Checking for children of non instantable object
 		var list_of_class = ClassDB.get_inheriters_from_class(object_name)
-		assert(list_of_class.size() > 0)  # Number of inherited class of non instantable class must be greater than 0, otherwise this function would be useless#,"Cannot find proper instantable child for " + object_name)
+		if list_of_class.size() > 0: # Number of inherited class of non instantable class must be greater than 0, otherwise this function would be useless#,"Cannot find proper instantable child for " + object_name)
+			print("GDSCRIPT WARNING: class can't be instantiated: " + object_name)
+			return BoxShape3D.new()
 		for i in list_of_class:
 			if ClassDB.can_instantiate(i) && (ClassDB.is_parent_class(i, "Node") || ClassDB.is_parent_class(i, "RefCounted")):
 				return ClassDB.instantiate(i)
-	assert(false)  #,"Cannot find proper instantable child for " + object_name)
+	print("GDSCRIPT WARNING: " + "Cannot find proper instantable child for " + object_name)
 	return BoxShape3D.new()
